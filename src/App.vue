@@ -59,7 +59,8 @@
                 </font>
               </strong>
             </span>
-            <a href class>
+            <!-- <a href class> -->
+            <router-link to="/cart">
               <i class="iconfont icon-cart"></i>
               <font style="vertical-align: inherit;">
                 <font style="vertical-align: inherit;">购物车（</font>
@@ -76,7 +77,8 @@
                 </span>
               </span>
               <font style="vertical-align: inherit;"></font>
-            </a>
+            </router-link>
+            <!-- </a> -->
           </div>
         </div>
       </div>
@@ -87,13 +89,15 @@
           <div id="menu2" class="nav-box menuhd">
             <ul>
               <li class="index">
-                <a href="#" class>
+                <!-- <a href="#" class> -->
+                <router-link to="/index">
                   <span class="out" style="top: 0px;">
                     <font style="vertical-align: inherit;">
                       <font style="vertical-align: inherit;">首页</font>
                     </font>
                   </span>
-                </a>
+                </router-link>
+                <!-- </a> -->
               </li>
               <li class="news">
                 <a href="#" class>
@@ -161,7 +165,7 @@
       </div>
     </div>
     <!-- 中间 -->
-  <router-view></router-view>
+    <router-view></router-view>
     <!-- 底部 -->
     <div class="footer">
       <div class="section">
