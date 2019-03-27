@@ -1,11 +1,32 @@
 import Vue from 'vue'
 import App from './App.vue'
-import vueRoutre from 'vue-router'
 
-Vue.use(vueRoutre);
+//导入全局样式
+import './assets/statics/site/css/style.css';
+
 Vue.config.productionTip = false
+//路由
+import vueRoutre from 'vue-router'
+Vue.use(vueRoutre);
+//导入 组件
+import index from './components/index.vue';
+//规则
+let routes = [
+  {
+    path: '/',
+    component: index
+  },
+  {
+    path: '/index',
+    component: index
+  }
+]
 
+let router = new vueRoutre({
+  routes
+})
 new Vue({
   el:'#app',
-  render: h => h(App)
+  render: h => h(App),
+  router
 })
