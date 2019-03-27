@@ -105,8 +105,27 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
-  name:'购物车'
+  name:'cart',
+
+  data() {
+    return {
+      carts:[]
+    }
+  },
+
+  created() {
+    
+    axios.get('http://111.230.232.110:8899/site/comment/getshopcargoods/88,102')
+    .then(res=>{
+      this.carts=res.daata.message
+    })
+
+  },
+
+  
+  
 };
 </script>
 

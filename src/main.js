@@ -11,6 +11,9 @@ Vue.use(vueRoutre);
 //导入 组件
 import index from './components/index.vue';
 import cart from './components/cart.vue';
+import detail from './components/detail.vue';
+
+
 
 //规则
 let routes = [
@@ -25,7 +28,12 @@ let routes = [
   {
     path: '/cart',
     component: cart
-  }
+  },
+  {
+    path: '/detail/:id',
+    component: detail
+  },
+ 
 ]
 
 let router = new vueRoutre({

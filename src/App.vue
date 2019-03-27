@@ -38,11 +38,13 @@
               </strong>
             </span>
             <span>
-              <a href class>
+              <!-- <a href class> -->
+                <router-link to="/userCenter">
                 <font style="vertical-align: inherit;">
                   <font style="vertical-align: inherit;">中心会员</font>
                 </font>
-              </a>
+                </router-link>
+              <!-- </a> -->
               <strong>
                 <font style="vertical-align: inherit;">
                   <font style="vertical-align: inherit;">|</font>

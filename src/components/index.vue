@@ -169,7 +169,11 @@
       <div class="main-tit">
         <h2>{{item.catetitle}}</h2>
         <p>
-          <a href="/goods/43.html" v-for="(it,index) in item.level2catelist" :key="index">{{it.subcatetitle}}</a>
+          <a
+            href="/goods/43.html"
+            v-for="(it,index) in item.level2catelist"
+            :key="index"
+          >{{it.subcatetitle}}</a>
           <a href="/goods/40.html">
             更多
             <i>+</i>
@@ -180,11 +184,10 @@
         <div class="wrap-box">
           <ul class="img-list">
             <li v-for="(it,index) in item.datas" :key="index">
-              <a href="#/site/goodsinfo/87" class>
+              <!-- <a href="#/site/goodsinfo/87" class> -->
+              <router-link :to="'/detail/'+it.artID">
                 <div class="img-box">
-                  <img
-                    :src="it.img_url"
-                  >
+                  <img :src="it.img_url">
                 </div>
                 <div class="info">
                   <h3>{{it.artTitle}}</h3>
@@ -199,7 +202,8 @@
                     </span>
                   </p>
                 </div>
-              </a>
+              </router-link>
+              <!-- </a> -->
             </li>
           </ul>
         </div>
@@ -210,7 +214,7 @@
 
 <script>
 import axios from "axios";
-import moment from 'moment';
+import moment from "moment";
 export default {
   name: "index",
   data() {
@@ -218,14 +222,13 @@ export default {
       catelist: [],
       sliderlist: [],
       toplist: [],
-      goodslist:[]
-
+      goodslist: []
     };
   },
-  filters:{
-      formatTime(value){
-         return moment(value).format('YYYY-MM-DD');
-      }
+  filters: {
+    formatTime(value) {
+      return moment(value).format("YYYY-MM-DD");
+    }
   },
 
   created() {
@@ -238,12 +241,12 @@ export default {
         this.toplist = res.data.message.toplist;
       });
     //   商品列表
-      axios.get('http://111.230.232.110:8899/site/goods/getgoodsgroup')
-      .then(res=>{
-          this.goodslist=res.data.message;
-      })
+    axios
+      .get("http://111.230.232.110:8899/site/goods/getgoodsgroup")
+      .then(res => {
+        this.goodslist = res.data.message;
+      });
   }
-
 };
 </script>
 
