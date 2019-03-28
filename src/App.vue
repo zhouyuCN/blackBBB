@@ -39,7 +39,7 @@
             </span>
             <span>
               <!-- <a href class> -->
-                <router-link to="/userCenter">
+                <router-link to="/userContainer">
                 <font style="vertical-align: inherit;">
                   <font style="vertical-align: inherit;">中心会员</font>
                 </font>

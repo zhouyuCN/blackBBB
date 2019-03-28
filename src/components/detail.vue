@@ -13,7 +13,13 @@
         <div class="wrap-box">
           <div class="left-925">
             <div class="goods-box clearfix">
-              <div class="pic-box"></div>
+              <div class="pic-box">
+                <el-carousel>
+                  <el-carousel-item v-for="(item,index) in imglist" :key="index">
+                    <img :src="item.original_path" alt>
+                  </el-carousel-item>
+                </el-carousel>
+              </div>
               <div class="goods-spec">
                 <h1>{{goodsinfo.title}}</h1>
                 <p class="subtitle">{{goodsinfo.sub_title}}</p>
@@ -40,35 +46,14 @@
                     <dt>购买数量</dt>
                     <dd>
                       <div class="stock-box">
-                        <div class="el-input-number el-input-number--small">
-                          <span role="button" class="el-input-number__decrease is-disabled">
-                            <i class="el-icon-minus"></i>
-                          </span>
-                          <span role="button" class="el-input-number__increase">
-                            <i class="el-icon-plus"></i>
-                          </span>
-                          <div class="el-input el-input--small">
-                            <!---->
-                            <input
-                              autocomplete="off"
-                              size="small"
-                              type="text"
-                              rows="2"
-                              max="60"
-                              min="1"
-                              validateevent="true"
-                              class="el-input__inner"
-                              role="spinbutton"
-                              aria-valuemax="60"
-                              aria-valuemin="1"
-                              aria-valuenow="1"
-                              aria-disabled="false"
-                            >
-                            <!---->
-                            <!---->
-                            <!---->
-                          </div>
-                        </div>
+                        <el-input-number
+                          size="mini"
+                          v-model="num1"
+                          @change="handleChange"
+                          :min="1"
+                          :max="99"
+                          label="描述文字"
+                        ></el-input-number>
                       </div>
                       <span class="stock-txt">
                         库存
@@ -119,6 +104,7 @@
                           sucmsg=" "
                           data-type="*10-1000"
                           nullmsg="请填写评论内容！"
+                          v-model="comment"
                         ></textarea>
                         <span class="Validform_checktip"></span>
                       </div>
@@ -129,6 +115,7 @@
                           type="submit"
                           value="提交评论"
                           class="submit"
+                          @click="postComment"
                         >
                         <span class="Validform_checktip"></span>
                       </div>
@@ -137,27 +124,31 @@
                   <ul id="commentList" class="list-box">
                     <p
                       style="margin: 5px 0px 15px 69px; line-height: 42px; text-align: center; border: 1px solid rgb(247, 247, 247);"
-                      v-show="reviews.length<=0"
+                      v-show="totalcount===0"
                     >暂无评论，快来抢沙发吧！</p>
-                    <li v-for="(item,index) in reviews" :key="index">
+                    <li v-for="(item,index) in commentList" :key="index">
                       <div class="avatar-box">
                         <i class="iconfont icon-user-full"></i>
                       </div>
                       <div class="inner-box">
                         <div class="info">
                           <span>{{item.user_name}}</span>
-                          <span>{{item.reply_time | newTime}}</span>
+                          <span>{{item.reply_time | golbalFormatTime}}</span>
                         </div>
                         <p>{{item.content}}</p>
                       </div>
                     </li>
                   </ul>
                   <div class="page-box" style="margin: 5px 0px 0px 62px;">
-                    <div id="pagination" class="digg">
-                      <span class="disabled" @click="page=page--">« 上一页</span>
-                      <span class="current">{{page}}</span>
-                      <span class="disabled" @click="page=page++">下一页 »</span>
-                    </div>
+                    <el-pagination
+                      @size-change="handleSizeChange"
+                      @current-change="handleCurrentChange"
+                      :current-page="pageIndex"
+                      :page-sizes="[10, 20, 30, 40]"
+                      :page-size="pageSize"
+                      layout="total, sizes, prev, pager, next, jumper"
+                      :total="totalcount"
+                    ></el-pagination>
                   </div>
                 </div>
               </div>
@@ -180,7 +171,7 @@
                       <!-- <a href="#/site/goodsinfo/90" class> -->
                       <router-link :to="'/detail/'+item.id">{{item.title}}</router-link>
                       <!-- </a> -->
-                      <span>{{item.add_time | newTime}}</span>
+                      <span>{{item.add_time | golbalFormatTime}}</span>
                     </div>
                   </li>
                 </ul>
@@ -194,7 +185,7 @@
 </template>
 
 <script>
-import moment from "moment";
+// import moment from "moment";
 export default {
   name: "detail",
   data() {
@@ -203,49 +194,126 @@ export default {
       goodsinfo: {},
       //推荐商品
       hotgoodslist: [],
-      //商品评论
-      reviews: [],
-      pageAll: "",
-      page: 1,
+      num1: 1,
+      imglist: [],
+      //评论内容
+      comment: "",
+      //总条数
+      totalcount: 0,
+      //页容量
+      pageSize: 10,
+      //页码
+      pageIndex: 1,
+      //评论组
+      commentList: [],
       //tab 索引
       index: 1
     };
   },
-  filters: {
-    newTime(value) {
-      return moment(value).format("YYYY-MM-DD");
+  // filters: {
+  //   newTime(value) {
+  //     return moment(value).format("YYYY-MM-DD");
+  //   }
+  //   // replyTime(value) {
+  //   //   return moment(value).format("YYYY-MM-DD HH:mm");
+  //   // }
+  // },
+  methods: {
+    //商品信息
+    getdetail() {
+      this.$axios
+        .get(`site/goods/getgoodsinfo/${this.$route.params.id}`)
+        .then(res => {
+          // console.log(res);
+          this.goodsinfo = res.data.message.goodsinfo;
+          this.hotgoodslist = res.data.message.hotgoodslist;
+          //商品图片
+          this.imglist = res.data.message.imglist;
+        });
     },
-    // replyTime(value) {
-    //   return moment(value).format("YYYY-MM-DD HH:mm");
-    // }
+    //渲染评论
+    getcomment() {
+      this.$axios
+        .get(
+          `site/comment/getbypage/goods/${this.$route.params.id}?pageIndex=${
+            this.pageIndex
+          }&pageSize=${this.pageSize}`
+        )
+        .then(res => {
+          // console.log(res);
+          //评论内容
+          this.commentList = res.data.message;
+          //总条数
+          this.totalcount = res.data.totalcount;
+        });
+    },
+    handleChange() {
+      console.log("点我了");
+    },
+    //评论
+    postComment() {
+      if (this.comment === "") {
+        this.$message({
+          message: "内容不能为空!!!"
+        });
+      } else {
+        this.$axios
+          .post(`site/validate/comment/post/goods/${this.$route.params.id}`, {
+            commenttxt: this.comment
+          })
+          .then(res => {
+            if (res.data.status === 0) {
+              this.$message.success(res.data.message);
+              this.getcomment();
+              this.comment = "";
+              this.pageIndex=1;
+            }
+          });
+      }
+    },
+    handleSizeChange(size){
+      this.pageSize=size;
+      this.getcomment();
+    },
+    handleCurrentChange(current){
+      this.pageIndex=current;
+       this.getcomment();
+    }
+    
   },
-
   created() {
     //商品信息
-    this.$axios
-      .get(`site/goods/getgoodsinfo/${this.$route.params.id}`)
-      .then(res => {
-        //   console.log(res);
-        this.goodsinfo = res.data.message.goodsinfo;
-        this.hotgoodslist = res.data.message.hotgoodslist;
-      });
+    this.getdetail();
 
     //商品评论
-    this.$axios
-      .get(
-        `site/comment/getbypage/goods/${this.$route.params.id}?pageIndex=${
-          this.page
-        }&pageSize=10`
-      )
-      .then(res => {
-        // console.log(res);
-        this.reviews = res.data.message;
-        let num = res.data.totalcount;
-        this.pageAll = Math.ceil(num / 10);
-      });
+    this.getcomment();
+  },
+  //侦听器
+  watch: {
+    $route() {
+      this.getdetail();
+    }
   }
 };
 </script>
 
 <style>
+.pic-box {
+  width: 300px;
+  height: 100%;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+.pic-box .el-carousel {
+  width: 100%;
+  height: 100%;
+}
+.pic-box .el-carousel__container img {
+  margin: 0 auto;
+  display: block;
+  width: 90%;
+  height: 100%;
+}
+.pic-box .el-carousel__indicators button {
+  background-color: #ccc;
+}
 </style>
