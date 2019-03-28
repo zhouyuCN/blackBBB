@@ -146,7 +146,7 @@
                       <div class="inner-box">
                         <div class="info">
                           <span>{{item.user_name}}</span>
-                          <span>{{item.reply_time | replyTime}}</span>
+                          <span>{{item.reply_time | newTime}}</span>
                         </div>
                         <p>{{item.content}}</p>
                       </div>
@@ -170,12 +170,16 @@
                 <ul class="side-img-list">
                   <li v-for="(item,index) in hotgoodslist" :key="index">
                     <div class="img-box">
-                      <a :href="'#/site/goodsinfo/'+item.id" class>
+                      <!-- <a :href="'#/site/goodsinfo/'+item.id" class> -->
+                      <router-link :to="'/detail/'+item.id">
                         <img :src="item.img_url">
-                      </a>
+                      </router-link>
+                      <!-- </a> -->
                     </div>
                     <div class="txt-box">
-                      <a href="#/site/goodsinfo/90" class>{{item.title}}</a>
+                      <!-- <a href="#/site/goodsinfo/90" class> -->
+                      <router-link :to="'/detail/'+item.id">{{item.title}}</router-link>
+                      <!-- </a> -->
                       <span>{{item.add_time | newTime}}</span>
                     </div>
                   </li>
@@ -190,7 +194,6 @@
 </template>
 
 <script>
-import axios from "axios";
 import moment from "moment";
 export default {
   name: "detail",
@@ -211,17 +214,16 @@ export default {
   filters: {
     newTime(value) {
       return moment(value).format("YYYY-MM-DD");
-    }
+    },
+    // replyTime(value) {
+    //   return moment(value).format("YYYY-MM-DD HH:mm");
+    // }
   },
 
   created() {
     //商品信息
-    axios
-      .get(
-        `http://111.230.232.110:8899/site/goods/getgoodsinfo/${
-          this.$route.params.id
-        }`
-      )
+    this.$axios
+      .get(`site/goods/getgoodsinfo/${this.$route.params.id}`)
       .then(res => {
         //   console.log(res);
         this.goodsinfo = res.data.message.goodsinfo;
@@ -229,11 +231,11 @@ export default {
       });
 
     //商品评论
-    axios
+    this.$axios
       .get(
-        `http://111.230.232.110:8899/site/comment/getbypage/goods/${
-          this.$route.params.id
-        }?pageIndex=${this.page}&pageSize=10`
+        `site/comment/getbypage/goods/${this.$route.params.id}?pageIndex=${
+          this.page
+        }&pageSize=10`
       )
       .then(res => {
         // console.log(res);

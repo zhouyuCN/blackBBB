@@ -105,7 +105,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 export default {
   name:'cart',
 
@@ -117,7 +116,7 @@ export default {
 
   created() {
     
-    axios.get('http://111.230.232.110:8899/site/comment/getshopcargoods/88,102')
+    this.$axios.get('site/comment/getshopcargoods/88,102')
     .then(res=>{
       this.carts=res.daata.message
     })
